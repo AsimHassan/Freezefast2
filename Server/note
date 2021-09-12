@@ -1,0 +1,6 @@
+Message queue for all incoming messaged
+separate callback for emergency and stop commands right in the message thread
+flags to know current state only one thread allowed to edit--- other thread could send messages
+
+
+separate call_backs for each kind of message  ??

@@ -2,3 +2,4 @@
 .ccls
 .vscode
 .ccls-cache
+.venv

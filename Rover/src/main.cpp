@@ -18,7 +18,8 @@ enum ROVER_STATES{
     OBSTACLE,
     EMERGENCY_STOP,
     FORWARD,
-    REVERSE 
+    REVERSE,
+    IDLE
 };
 
 String statestring_rover[]={
@@ -31,7 +32,8 @@ String statestring_rover[]={
     "OBSTACLE",
     "EMERGENCY_STOP",
     "FORWARD",
-    "REVERSE"
+    "REVERSE",
+    "IDLE"
 };
 String statestring_network[]={
     "DISCONNECTED",
@@ -39,16 +41,16 @@ String statestring_network[]={
     "CONNECTED"
 };
 
-const char* fwd_topic = ROVER_ID "/FWD";
-const char* rev_topic = ROVER_ID "/REV";
-const char* sld_topic = ROVER_ID "/SLD";
-const char* buz_topic = ROVER_ID "/BUZ";
+const char* fwd_topic = ROVER_ID "in/FWD";
+const char* rev_topic = ROVER_ID "in/REV";
+const char* sld_topic = ROVER_ID "in/SLD";
+const char* buz_topic = ROVER_ID "in/BUZ";
 const char* lms_f_topic = ROVER_ID "/LMS_F";
 const char* lms_b_topic = ROVER_ID "/LMS_B";
 const char* sens_b_topic = ROVER_ID "/SENS_B";
 const char* sens_f_topic = ROVER_ID "/SENS_F";
 const char* state_topic = ROVER_ID "/STATE";
-
+const char* emergency_in_topic = "emergency_in";
 
 
 uint8_t current_wifi_state = DISCONNECTED;
@@ -260,6 +262,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
+  if(strcmp(topic,emergency_in_topic)==0){
+          current_rover_state = EMERGENCY_STOP;
+          mqttclient.publish("rover/ack","EMERGENCY|ACK");
+          return;
+  }
   for (int i=0;i<length;i++) {
     Serial.print((char)payload[i]);
   }
@@ -289,6 +296,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
           current_rover_state = EMERGENCY_STOP;
           mqttclient.publish("rover/ack","EMERGENCY|ACK");
         
+      }else if (strcmp(msg,"REST")==0){
+          current_rover_state = RESTING;
+          mqttclient.publish("rover/ack","RESTING|ACK");
       }
 
 
@@ -350,6 +360,7 @@ int mqtt_state_machine(){
                     Serial.println("Connected to server");
                     mqttclient.publish("status/rover/connection","CONNECTED");
                     mqttclient.subscribe("rover/msgin");
+                    mqttclient.subscribe(emergency_in_topic);
                     current_mqtt_state = CONNECTED;
                 }
                 else{

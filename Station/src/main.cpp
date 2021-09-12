@@ -78,6 +78,7 @@ const char* emergency_topic     = STATIONID "/emergency";
 const char* emergencyack_topic  = STATIONID "/emergency_ack"; 
 const char* emergencyover_topic = STATIONID "/emergency_over";
 const char* state_topic         = STATIONID "/state";
+const char* emergencyin_topic   = "emergency/in/start"; 
 
 
 unsigned long emergency_timer_0 = 0l;
@@ -302,20 +303,15 @@ int station_state_machine(){
 
         case EMERGENCY:
             if (redswitch == LOW){
-                delay(60);
+                delay(100);
                 mqttclient.publish(emergency_topic,"T");
                 emergency_timer_0 = millis();
-                current_station_state = STOPPED;
             }
             break;
         
         case STOPPED:
-            if(emergency_ack_flag == true){
                 digitalWrite(RED_LED_PIN,HIGH);
-            }
-            if(millis()-emergency_timer_0 > 1000 && emergency_ack_flag == false){
-                current_station_state = EMERGENCY;
-            }
+                digitalWrite(GREEN_LED_PIN,LOW);
             break;
     }
 
@@ -376,9 +372,16 @@ void callback(char* topic, byte* payload, unsigned int length){
         emergency_ack_flag = true;
         return;
     }
+    if (strcmp(topic,emergencyin_topic)==0){
+        previous_station_state = current_station_state;
+        current_station_state = STOPPED;
+        emergency_ack_flag = true;
+        return;
+    }
     if (strcmp(topic,emergencyover_topic) == 0){
         emergency_ack_flag = false;
         current_station_state = RESET;
+        //esp_restart();
         return;
     }
     if (strcmp(topic,goack_topic)==0){
@@ -410,6 +413,7 @@ int mqtt_state_machine(){
                     mqttclient.subscribe(crossyes_topic);
                     mqttclient.subscribe(emergencyack_topic);
                     mqttclient.subscribe(emergencyover_topic);
+                    mqttclient.subscribe(emergencyin_topic);
 
                     mqttclient.subscribe(callack_topic);
                     mqttclient.subscribe(goack_topic);
