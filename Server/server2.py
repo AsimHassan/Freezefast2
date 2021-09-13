@@ -2,7 +2,8 @@ import threading
 from time import sleep
 import paho.mqtt.client as mqtt
 import queue
-import json
+import process
+
 MQTTHOST = '127.0.0.1'
 MQTTPORT = 1883
 
@@ -19,11 +20,16 @@ active_client_list= set()
 # update rover position 
 # check if rover is going in correct direction, change if necessary
 # pop stations from path as rover moves along
+
 def on_rover_cross(client,userdata,message):
     stat = message.payload.decode()
-    stat_id = stat.split('|')[1]
+    rovercross_q.put(stat) 
     
 
+def on_stop_command(client,userdata,message):
+    stat = message.payload.decode()
+    client.publish('ROVER/msgin',"STOP")
+    client.publish(f'{stat}/stopack','ack')
 
 
 ######## on rover cross junction #############################
@@ -105,6 +111,10 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe('Server/msg/in')
     client.subscribe('HMI/emergency_over')
     client.subscribe('ROVER/STATE')
+    client.subscribe('HMI/layout/new')
+    client.subscribe('+/rovercross')
+    client.subscribe('+/go')
+    client.subscribe('+/stop')
 
 
 def on_disconnect(client:mqtt.Client, userdata, rc):
@@ -131,7 +141,11 @@ def mqttthread():
         c_mqtt.message_callback_add('status/+/connection',on_status_connnected_message)
         c_mqtt.message_callback_add('status/+/disconnection',on_status_disconnected_message)
         c_mqtt.message_callback_add('ROVER/STATE',on_rover_stateupdate)
+        c_mqtt.message_callback_add('HMI/layout/new',on_layout_message)
+        c_mqtt.message_callback_add('+/rovercross',on_rover_cross)
+        c_mqtt.message_callback_add('+/stop',on_stop_command)
         c_mqtt.loop_forever()
+
     except KeyboardInterrupt:
         print('keyboard interrupt received')
     except :
@@ -140,21 +154,25 @@ def mqttthread():
 
 
 def print_queue(client:mqtt.Client):
+    process_obj = process.Process(client,callqueue,roverstate_q,rovercross_q,layout_q,go_msg_q)
     while True:
-        if not msgQueue.empty():
-            print(msgQueue.empty())
-            msg = msgQueue.get()
 
-            print(msgQueue.empty())
-            print(msg.payload)
-            client.publish('Server/msg/out',msg.payload)
+        process_obj.run()
+        sleep(2)
+        # if not msgQueue.empty():
+        #     print(msgQueue.empty())
+        #     msg = msgQueue.get()
 
-        if not callqueue.empty():
-            msg = callqueue.get()
-            print(msg)
+        #     print(msgQueue.empty())
+        #     print(msg.payload)
+        #     client.publish('Server/msg/out',msg.payload)
+
+        # if not callqueue.empty():
+        #     msg = callqueue.get()
+        #     print(msg)
          
-        if msgQueue.empty():
-            sleep(0.1)
+        # if msgQueue.empty():
+        #     sleep(0.1)
 
 
 

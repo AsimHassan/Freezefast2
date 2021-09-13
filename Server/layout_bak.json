@@ -1,0 +1,84 @@
+{
+  "stations": [
+    {
+      "ID": 1,
+      "Type": "STATION",
+      "left": 2,
+      "right": null
+    },
+    {
+      "ID": 2,
+      "Type": "STATION",
+      "left": 3,
+      "right": 1
+    },
+    {
+      "ID": 12,
+      "Type": "JUNCTION",
+      "left": 5,
+      "right": 4,
+      "up": 13,
+      "down": 11
+    },
+    {
+      "ID": 3,
+      "Type": "STATION",
+      "left": 4,
+      "right": 2
+    },
+    {
+      "ID": 4,
+      "Type": "STATION",
+      "left": 5,
+      "right": 3
+    },
+    {
+      "ID": 5,
+      "Type": "STATION",
+      "left": 6,
+      "right": 12
+    },
+    {
+      "ID": 6,
+      "Type": "STATION",
+      "left": 5,
+      "right": 7
+    },
+    {
+      "ID": 7,
+      "Type": "STATION",
+      "left": 6,
+      "right": 8
+    },
+    {
+      "ID": 8,
+      "Type": "STATION",
+      "left": 7,
+      "right": 9
+    },
+    {
+      "ID": 9,
+      "Type": "STATION",
+      "left": 8,
+      "right": 10
+    },
+    {
+      "ID": 10,
+      "Type": "STATION",
+      "left": 9,
+      "right": null
+    },
+    {
+      "ID": 11,
+      "Type": "STATION",
+      "up": null,
+      "down": 12
+    },
+    {
+      "ID": 13,
+      "Type": "STATION",
+      "up": 12,
+      "down": null
+    }
+  ]
+}
