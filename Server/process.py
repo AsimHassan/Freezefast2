@@ -1,5 +1,5 @@
 from json.encoder import py_encode_basestring_ascii
-from os import stat
+from os import spawnl, stat
 from time import sleep
 from paho.mqtt.client import Client
 import rover
@@ -20,8 +20,9 @@ rover_msgin_topic = 'ROVER/msgin'
 global layout_q
 
 class Process():
-    def __init__(self,mqtt_client:Client,callq,roverstate_q,rovercross_q,layout_q,go_msg_q):
+    def __init__(self,mqtt_client:Client,callq,roverstate_q,rovercross_q,layout_q,go_msg_q,junction_q):
         self.station_list = station.readfromlayout('layout.json')
+
         
 
 
@@ -44,6 +45,8 @@ class Process():
         self.rovercross_q = rovercross_q
         self.layout_q = layout_q
         self.go_msg_q = go_msg_q
+        self.junction_q = junction_q
+        self.rotation_destination = None
 
 
     def check_new_layout(self):
@@ -111,7 +114,47 @@ class Process():
             print(f"state updated {self.rover_obj.state}")
 
     def checkJunctionmsgs(self):
-        pass
+
+        """
+        junction messages 
+        1. rover stopped ->         JUNCTION|ID|RS
+        2. rotation done ->         JUNCTION|ID|RD:S/C
+        3. rover ready to leave->   JUNCTION|ID|RRL 
+        """
+        if self.junction_q.empty():
+            return
+        while not self.junction_q.empty():
+            message = self.junction_q.get()
+            [sender_type,junc_id,msg]= message.split('|')
+            junction = station.get_station(junc_id)
+            if msg == 'RS':
+                if int(self.rover_obj.destination) in [int(junction.left.st_id), int(junction.right.st_id)]:
+                    self.mqttclient.publish(f'{sender_type}|{junc_id}/rotate',"S")
+                    self.rotation_destination = 'S'
+                    return
+                if int(self.rover_obj.destination) in [int(junction.up.st_id), int(junction.down.st_id),]:
+                    self.mqttclient.publish(f'{sender_type}|{junc_id}/rotate',"C")
+                    self.rotation_destination = 'C'
+                    return
+            if msg == 'RRL':
+                self.rover_obj.path,self.rover_obj.direction = station.get_direction(self.station_list,self.rover_obj.position,self.rover_obj.destination,self.rover_obj.path)
+                self.mqttclient.publish(rover_msgin_topic,self.rover_obj.direction)
+                return
+            
+            direction = msg.split(':')[1]
+            if direction != self.rotation_destination :
+                self.mqttclient.publish(f'{sender_type}|{junc_id}/rotate',self.rotation_destination)
+                return 
+            if direction == self.rotation_destination:
+                self.rotation_destination = None
+                self.mqttclient.publish(f'{sender_type}|{junc_id}/rotate_ok','Y')
+
+
+            
+
+                
+
+        
 
     def put_rover_to_rest(self,sender):
         self.rover_obj.state = 99

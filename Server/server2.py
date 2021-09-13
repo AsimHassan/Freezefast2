@@ -37,8 +37,6 @@ def on_stop_command(client,userdata,message):
 # if rover needs to turn send slowdown and crossyes
 # if rover dont need to turn send crossno
 # send direction ??
-def on_rover_cross_junction(client,userdata,message):
-    junction_q.put(message.payload.decode())
 
 
 ###### on_rotation done #################################
@@ -47,9 +45,20 @@ def on_rover_cross_junction(client,userdata,message):
 def on_junction_rotation_done(client,userdata,message):
     junction_q.put(message.payload.decode())
 
+def on_junction_rover_stopped_at_junction(client,userdata,message):
+    junction_q.put(message.payload.decode)
+
+def on_readytoleave(client,userdata,message):
+    junction_q.put(message.payload.decode())
+
 ########## on GO signal received #################################
 def on_go_signal(client,userdata,message):
     go_msg_q.put(message.payload.decode())
+
+def on_slowdown(client,userdata,message):
+    stat = message.payload.decode()
+    client.publish('ROVER/msgin',"SLOWDOWN")
+    client.publish(f'{stat}/slowdown','ack')
 
 
 ############# on call ##################
@@ -115,6 +124,8 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe('+/rovercross')
     client.subscribe('+/go')
     client.subscribe('+/stop')
+    client.subscribe('+/slowdown')
+    client.subscribe('+/readytoleave')
 
 
 def on_disconnect(client:mqtt.Client, userdata, rc):
@@ -154,7 +165,7 @@ def mqttthread():
 
 
 def print_queue(client:mqtt.Client):
-    process_obj = process.Process(client,callqueue,roverstate_q,rovercross_q,layout_q,go_msg_q)
+    process_obj = process.Process(client,callqueue,roverstate_q,rovercross_q,layout_q,go_msg_q,junction_q)
     while True:
 
         process_obj.run()
