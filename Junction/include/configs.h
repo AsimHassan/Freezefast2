@@ -19,8 +19,9 @@
 
 /************************************************/
 #define TIME_BUZZER 4000
-#define ID 1
+#define ID "1"
 
 
-#define JUNCTIONID "JUNCTION1"
+#define JUNCTIONID "JUNCTION|"ID
+
 #endif 

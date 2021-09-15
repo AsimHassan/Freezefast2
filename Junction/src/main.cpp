@@ -86,8 +86,11 @@ const char* sensorA1_topic          = JUNCTIONID "/input/sensorA1";
 const char* sensorA2_topic          = JUNCTIONID "/input/sensorA2";
 const char* readytoleave_topic      = JUNCTIONID "/readytoleave";
 const char* rotationdone_topic      = JUNCTIONID "/rotationdone";
+const char* roverstopppedjunc_topic = JUNCTIONID "/roverstoppedjunction"
 const char* junctionstate_topic     = JUNCTIONID "/junctionstate";
 const char* rotationstate_topic     = JUNCTIONID "/rotationstate";
+const char* rotatein_topic          = JUNCTIONID "/rotate";
+
 const char* emergency_stop          = "emergency";
 
 uint8_t current_junction_state = IDLE;
@@ -329,6 +332,17 @@ void send_to_server(uint8_t junction_state,
     mqttclient.publish(buzzer_topic,itoa(buzzer,s,10));
     mqttclient.publish(irsensor_topic,itoa(roverIR,s,10));
 }
+
+
+void callback(char* topic, byte* payload, unsigned int length){
+    strcmp()
+
+
+
+}
+
+
+
 
 int mqtt_state_machine(){
     unsigned long reconnection_time_0;
