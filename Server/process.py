@@ -50,7 +50,7 @@ class Process():
 
 
     def check_new_layout(self):
-        print(f"check_new_layout")
+        # print(f"check_new_layout")
         if not self.layout_q.empty():
             _layout = self.layout_q.get()
             self.station_list = station.layoutfromText(_layout)
@@ -59,10 +59,11 @@ class Process():
     def checkcallq(self):
         """Check if call q empty, check if roverfree, then get call from the station and send the rover"""
 
-        print(f"check_callq")
+        # print(f"check_callq")
         if not self.callq.empty() and self.rover_obj.roverfree():
             called_station = self.callq.get()
             _station_number = called_station.split('|')[1]
+            self.rover_obj.path=[]
             self.rover_obj.path,self.rover_obj.direction = station.get_direction(self.station_list,self.rover_obj.position,_station_number,self.rover_obj.path)
             self.rover_obj.destination = _station_number
             self.mqttclient.publish(rover_msgin_topic,self.rover_obj.direction)
@@ -70,7 +71,7 @@ class Process():
 
     def checkrovercrossq(self):
         
-        print(f"checkrovercrossq")
+        # print(f"checkrovercrossq")
         while not self.rovercross_q.empty():
             print("cross q not empty")
             crossed_station = self.rovercross_q.get()
@@ -83,16 +84,18 @@ class Process():
                 if crossed_station_type == 'JUNCTION':
                     if crossed_station_obj.up in self.rover_obj.path or crossed_station_obj.down in self.rover_obj.path:
                         self.mqttclient.publish(f'{crossed_station}/crossyes','Y')
+                        self.mqttclient.publish(f'ROVER/msgin','SLOWDOWN')
                     else:
                         self.mqttclient.publish(f'{crossed_station}/crossno','Y')
                     continue
                 if self.rover_obj.destination == crossed_station_id:
                     self.mqttclient.publish(f'{crossed_station}/crossyes','Y')
+                    self.mqttclient.publish(f'ROVER/msgin','SLOWDOWN')
                     continue
                 if crossed_station_obj not in self.rover_obj.path:
                     self.recalculatedirection()
             self.mqttclient.publish(f'{crossed_station}/crossno','Y')
-        print("crossq empty")
+        # print("crossq empty")
 
 
 
@@ -101,6 +104,7 @@ class Process():
     def recalculatedirection(self):
         
         print(f"recalculatedirection")
+        self.rover_obj.path=[]
         self.rover_obj.path,self.rover_obj.direction =  station.get_direction(self.station_list,self.rover_obj.position,self.rover_obj.destination,self.rover_obj.path)  
         self.mqttclient.publish(rover_msgin_topic,self.rover_obj.direction)
         self.rover_obj.state = 99
@@ -108,7 +112,7 @@ class Process():
 
 
     def check_roverstate_q(self):
-        print(f"checkroverstateq")
+        # print(f"checkroverstateq")
         while not self.roverstate_q.empty():
             self.rover_obj.state =  self.roverstate_q.get()
             print(f"state updated {self.rover_obj.state}")
@@ -121,6 +125,7 @@ class Process():
         2. rotation done ->         JUNCTION|ID|RD:S/C
         3. rover ready to leave->   JUNCTION|ID|RRL 
         """
+        # print("check junction messages")
         if self.junction_q.empty():
             return
         while not self.junction_q.empty():
@@ -137,6 +142,7 @@ class Process():
                     self.rotation_destination = 'C'
                     return
             if msg == 'RRL':
+                self.rover_obj.path=[]
                 self.rover_obj.path,self.rover_obj.direction = station.get_direction(self.station_list,self.rover_obj.position,self.rover_obj.destination,self.rover_obj.path)
                 self.mqttclient.publish(rover_msgin_topic,self.rover_obj.direction)
                 return
@@ -164,6 +170,7 @@ class Process():
     def send_rover_to_coldroom_or_sipup(self,sender,dest):
         self.rover_obj.state = 99
         coldroom = station.get_station_by_name(self.station_list,dest)
+        self.rover_obj.path=[]
         self.rover_obj.path,self.rover_obj.direction = station.get_direction(self.station_list,self.rover_obj.position,coldroom.st_id,self.rover_obj.path)
         self.mqttclient.publish(rover_msgin_topic,self.rover_obj.direction)
         self.mqttclient.publish(f'{sender}/goack','Y')
@@ -171,13 +178,14 @@ class Process():
 
     def checkgomessages(self):
         # check if position and go station are the same
-
+        # print("check go messages")
         if self.go_msg_q.empty():
             return
         sender = self.go_msg_q.get()
         sendersplit =  sender.split('|')
         sender_name = sendersplit[0]
         sender_id = sendersplit[1]
+        print(f"{sender}|{sendersplit}|{sender_id}|{sender_name}")
         if int(sender_id) != int(self.rover_obj.position):
             print("why am i getting this go signal")
             return
@@ -190,6 +198,7 @@ class Process():
             if sendlocation:
                 self.rover_obj.state =99
                 self.rover_obj.destination = sendlocation
+                self.rover_obj.path = []
                 self.rover_obj.path,self.rover_obj.direction = station.get_direction(self.station_list,sender_id,sendlocation,self.rover_obj.path)
                 self.mqttclient.publish(rover_msgin_topic,self.rover_obj.direction)
                 self.mqttclient.pulish('HMI/goack','ack')
@@ -235,6 +244,7 @@ class Process():
 
 
         if self.rover_obj.payload == 1:
+            print("has a payload sending to coldroom")
             self.rover_obj.payload =2
             self.send_rover_to_coldroom_or_sipup(sender,'COLDROOM')
             return
@@ -244,6 +254,8 @@ class Process():
         self.checkcallq()
         self.checkrovercrossq()
         self.check_roverstate_q()
+        self.checkJunctionmsgs()
+        self.checkgomessages()
         sleep(0.1)
 
 

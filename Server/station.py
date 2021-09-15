@@ -58,9 +58,9 @@ def process_layout(station_dict):
     except KeyError:
         print(f"R",end="")
     try:
-        st_name = station_dict['Name']
+        st_name = station_dict['name']
     except KeyError:
-        print(f"Name",end="")
+        print(f"name",end="")
     try:
         left = station_dict['left']
     except KeyError:
@@ -143,7 +143,8 @@ def get_rover_direction(path_rover_direction):
 def get_direction(station_list,start,end,path_get_direction):
     print("get direction")
     bfs_q = queue.Queue()
-    stat = get_station(station_list,start)
+    print(start)
+    stat = get_station(station_list,int(start))
     visited = []
     path_possible= search(stat,end,bfs_q,visited,path_get_direction)
     if path_possible:

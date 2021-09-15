@@ -54,6 +54,7 @@ def on_readytoleave(client,userdata,message):
 ########## on GO signal received #################################
 def on_go_signal(client,userdata,message):
     go_msg_q.put(message.payload.decode())
+    print("added to go q")
 
 def on_slowdown(client,userdata,message):
     stat = message.payload.decode()
@@ -126,6 +127,9 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe('+/stop')
     client.subscribe('+/slowdown')
     client.subscribe('+/readytoleave')
+    client.subscribe('+/roverstoppedjunction')
+    client.subscribe('+/rotationdone')
+    
 
 
 def on_disconnect(client:mqtt.Client, userdata, rc):
@@ -136,6 +140,7 @@ def on_message(client, userdata, message):
     msgQueue.put(message)
 
 def on_layout_message(client, userdata,message):
+    print("got new layout")
     layout_q.put(message.payload.decode())
 
 
@@ -155,6 +160,7 @@ def mqttthread():
         c_mqtt.message_callback_add('HMI/layout/new',on_layout_message)
         c_mqtt.message_callback_add('+/rovercross',on_rover_cross)
         c_mqtt.message_callback_add('+/stop',on_stop_command)
+        c_mqtt.message_callback_add('+/go',on_go_signal)
         c_mqtt.loop_forever()
 
     except KeyboardInterrupt:
@@ -169,7 +175,7 @@ def print_queue(client:mqtt.Client):
     while True:
 
         process_obj.run()
-        sleep(2)
+        # sleep(2)
         # if not msgQueue.empty():
         #     print(msgQueue.empty())
         #     msg = msgQueue.get()
