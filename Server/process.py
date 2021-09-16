@@ -146,14 +146,14 @@ class Process():
                 self.rover_obj.path,self.rover_obj.direction = station.get_direction(self.station_list,self.rover_obj.position,self.rover_obj.destination,self.rover_obj.path)
                 self.mqttclient.publish(rover_msgin_topic,self.rover_obj.direction)
                 return
-            
-            direction = msg.split(':')[1]
-            if direction != self.rotation_destination :
-                self.mqttclient.publish(f'{sender_type}|{junc_id}/rotate',self.rotation_destination)
-                return 
-            if direction == self.rotation_destination:
-                self.rotation_destination = None
-                self.mqttclient.publish(f'{sender_type}|{junc_id}/rotate_ok','Y')
+            if msg =='RD':
+                direction = msg.split(':')[1]
+                if direction != self.rotation_destination :
+                    self.mqttclient.publish(f'{sender_type}|{junc_id}/rotate',self.rotation_destination)
+                    return 
+                if direction == self.rotation_destination:
+                    self.rotation_destination = None
+                    self.mqttclient.publish(f'{sender_type}|{junc_id}/rotate_ok','Y')
 
 
             

@@ -240,7 +240,7 @@ int station_state_machine(){
                 roverhere_0 = millis();
             }
             if (rover_owner == NOTFORYOU){
-                rover_owner = false;
+                rover_owner = UNKNOWN;
                 current_station_state =previous_station_state;
 
                 break;

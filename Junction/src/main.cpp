@@ -86,7 +86,7 @@ const char* sensorA1_topic          = JUNCTIONID "/input/sensorA1";
 const char* sensorA2_topic          = JUNCTIONID "/input/sensorA2";
 const char* readytoleave_topic      = JUNCTIONID "/readytoleave";
 const char* rotationdone_topic      = JUNCTIONID "/rotationdone";
-const char* roverstopppedjunc_topic = JUNCTIONID "/roverstoppedjunction"
+const char* roverstopppedjunc_topic = JUNCTIONID "/roverstoppedjunction";
 const char* junctionstate_topic     = JUNCTIONID "/junctionstate";
 const char* rotationstate_topic     = JUNCTIONID "/rotationstate";
 const char* rotatein_topic          = JUNCTIONID "/rotate";
@@ -136,8 +136,15 @@ void setup(){
 }
 
 void loop(){
-
-
+    if(wifi_state_machine()){
+        if(mqtt_state_machine()){
+            junction_state_machine();
+            rotating_state_machine();
+            mqttclient.loop();
+        }
+    }else{
+        turnAllOutputOff();
+    }
 }
 
 int junction_state_machine(){
@@ -180,6 +187,8 @@ int junction_state_machine(){
             if(millis() - rover_cross2_timer_0 > 500 && IR_sensor == HIGH)
             {
                 delay(50);
+                mqttclient.publish(roverstopppedjunc_topic,"RS");
+
             }
             // if(millis()-rover_cross2_timer_0 > 1000 && IR_Sensor == LOW){
             //     JUNCTION_STATE = ERROR_ROTATION;
@@ -202,6 +211,7 @@ int junction_state_machine(){
             if(IR_sensor == LOW){
                 current_junction_state = ROVER_LEAVING;
                 rover_cross1_timer_0 = millis();
+                mqttclient.publish(readytoleave_topic,"RRL")
             }
             break;
         case ROVER_LEAVING:
@@ -223,6 +233,7 @@ int junction_state_machine(){
             break;
         case JUNCTION_ERROR:
             turnAllOutputOff();
+            digitalWrite(BUZZER_PIN,HIGH);
             break;
     }
     return current_junction_state;
@@ -305,7 +316,10 @@ switch (current_rotating_state){
         break;
 
     case SEND_MESSAGE:
-        mqttclient.publish(rotationdone_topic, "Y");
+        if (current_position == STRAIGHT)
+            mqttclient.publish(rotationdone_topic, "S");
+        if (current_position == CROSS)
+            mqttclient.publish(rotationdone_topic, "C");
         current_rotating_state = DONE;
         break;
 
@@ -358,6 +372,10 @@ int mqtt_state_machine(){
                     mqttclient.publish("status/" JUNCTIONID "/connection","CONNECTED");
                     mqttclient.subscribe(JUNCTIONID "/msgin");
                     mqttclient.subscribe(emergency_stop);
+                    mqttclient.subscribe(crossyes_topic);
+                    mqttclient.subscribe(crossno_topic);
+                    mqttclient.subscribe(rotatein_topic);
+                    mqttclient.subscribe(rota)
                     current_mqtt_state = CONNECTED;
                 }
                 else{
