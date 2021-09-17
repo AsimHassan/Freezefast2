@@ -26,7 +26,9 @@ enum JUNCTIION_STATES_ENUM{
     ROVER_LEAVING,
     ROVER_LEAVING2,
     ROVER_LEFT,
-    JUNCTION_ERROR
+    JUNCTION_ERROR,
+    EMERGENCY,
+    EMERGENCY_OVER
 };
 
 String statearray[] = {
@@ -40,7 +42,9 @@ String statearray[] = {
     "ROVER_LEAVING",
     "ROVER_LEAVING2",
     "ROVER_LEFT",
-    "JUNCTION_ERROR"
+    "JUNCTION_ERROR",
+    "EMERGENCY",
+    "EMERGENCY_OVER"
 };
 enum current_rotating_states{
     WAIT,
@@ -73,7 +77,7 @@ PubSubClient mqttclient(espclient);
 
 
 const char* rovercross_topic        = JUNCTIONID "/cross1";
-const char* rovercross2_topic       = JUNCTIONID "/cross2";
+const char* roverstop_topic         = JUNCTIONID "/stop";
 const char* crossyes_topic          = JUNCTIONID "/crossyes";
 const char* crossno_topic           = JUNCTIONID "/crossno";
 const char* direction_topic         = JUNCTIONID "/direction";
@@ -90,8 +94,10 @@ const char* roverstopppedjunc_topic = JUNCTIONID "/roverstoppedjunction";
 const char* junctionstate_topic     = JUNCTIONID "/junctionstate";
 const char* rotationstate_topic     = JUNCTIONID "/rotationstate";
 const char* rotatein_topic          = JUNCTIONID "/rotate";
-
 const char* emergency_stop          = "emergency";
+const char* emergencyover_topic = "emergency/in/end"; 
+const char* emergencyin_topic   = "emergency/in/start"; 
+
 
 uint8_t current_junction_state = IDLE;
 uint8_t current_rotating_state = ENTRY;
@@ -171,7 +177,7 @@ int junction_state_machine(){
             break;
         case ROVER_CROSS_INTER:
             if (IR_sensor == HIGH){
-                mqttclient.publish(rovercross2_topic,"Y");
+                mqttclient.publish(roverstop_topic ,"Y");
                 current_junction_state = ROVER_CROSS2;
                 rover_cross2_timer_0 = millis();
             }
@@ -211,7 +217,7 @@ int junction_state_machine(){
             if(IR_sensor == LOW){
                 current_junction_state = ROVER_LEAVING;
                 rover_cross1_timer_0 = millis();
-                mqttclient.publish(readytoleave_topic,"RRL")
+                mqttclient.publish(readytoleave_topic,"RRL");
             }
             break;
         case ROVER_LEAVING:
@@ -231,6 +237,10 @@ int junction_state_machine(){
             delay(1000);
             current_junction_state = IDLE;
             break;
+        case EMERGENCY:
+            turnAllOutputOff();
+        case EMERGENCY_OVER:
+            current_junction_state = IDLE;
         case JUNCTION_ERROR:
             turnAllOutputOff();
             digitalWrite(BUZZER_PIN,HIGH);
@@ -349,10 +359,33 @@ void send_to_server(uint8_t junction_state,
 
 
 void callback(char* topic, byte* payload, unsigned int length){
-    strcmp()
 
+    char msg[length+1];
+    memcpy(msg,payload,length);
+    msg[length] = '\0';
+    if (strcmp(topic,crossno_topic)==0){
+        current_junction_state = IDLE;
+    }
+    if (strcmp(rotateccw_topic,topic) == 0){
+        if(msg[0] == 'S'){
+            destination = STRAIGHT;
+        }
+        if (msg[0] == 'C'){
+            destination = CROSS;
 
+        }
 
+    }
+
+    if (strcmp(topic,emergencyin_topic)==0){
+        current_junction_state =EMERGENCY;
+        return;
+    }
+    if (strcmp(topic,emergencyover_topic) == 0){
+        current_junction_state = EMERGENCY_OVER;
+        //esp_restart();
+        return;
+    }
 }
 
 
@@ -375,7 +408,6 @@ int mqtt_state_machine(){
                     mqttclient.subscribe(crossyes_topic);
                     mqttclient.subscribe(crossno_topic);
                     mqttclient.subscribe(rotatein_topic);
-                    mqttclient.subscribe(rota)
                     current_mqtt_state = CONNECTED;
                 }
                 else{
