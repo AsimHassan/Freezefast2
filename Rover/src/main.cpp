@@ -50,7 +50,9 @@ const char* lms_b_topic = ROVER_ID "/LMS_B";
 const char* sens_b_topic = ROVER_ID "/SENS_B";
 const char* sens_f_topic = ROVER_ID "/SENS_F";
 const char* state_topic = ROVER_ID "/STATE";
-const char* emergency_in_topic = "emergency_in";
+
+const char* emergencyover_topic = "emergency/in/end"; 
+const char* emergencyin_topic   = "emergency/in/start"; 
 
 
 uint8_t current_wifi_state = DISCONNECTED;
@@ -241,7 +243,6 @@ int rover_state_machine(){
             rev = LOW;
             sld = LOW;
             buz = HIGH;
-            buz = HIGH;
             break;
 
 
@@ -300,7 +301,15 @@ void callback(char* topic, byte* payload, unsigned int length) {
           current_rover_state = RESTING;
           mqttclient.publish("rover/ack","RESTING|ACK");
       }
-
+    if (strcmp(topic,emergencyin_topic)==0){
+        current_rover_state =EMERGENCY_STOP;
+        return;
+    }
+    if (strcmp(topic,emergencyover_topic) == 0){
+        current_rover_state = RESET;
+        //esp_restart();
+        return;
+    }
 
       
   }else{

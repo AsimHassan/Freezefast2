@@ -76,7 +76,7 @@ const char* callack_topic       = STATIONID "/callack";
 const char* goack_topic         = STATIONID "/goack";
 const char* emergency_topic     = STATIONID "/emergency";
 const char* emergencyack_topic  = STATIONID "/emergency_ack"; 
-const char* emergencyover_topic = STATIONID "/emergency_over";
+const char* emergencyover_topic = "emergency/in/end"; 
 const char* state_topic         = STATIONID "/state";
 const char* emergencyin_topic   = "emergency/in/start"; 
 
@@ -303,9 +303,11 @@ int station_state_machine(){
 
         case EMERGENCY:
             if (redswitch == LOW){
-                delay(100);
                 mqttclient.publish(emergency_topic,"T");
                 emergency_timer_0 = millis();
+                digitalWrite(RED_LED_PIN,HIGH);
+                digitalWrite(GREEN_LED_PIN,LOW);
+                delay(300);
             }
             break;
         

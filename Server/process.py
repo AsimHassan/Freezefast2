@@ -6,7 +6,7 @@ import rover
 import station
 
 rover_msgin_topic = 'ROVER/msgin'
-
+layout_update_topic = 'HMI/layoutupdate'
 
 
 ######## processs #################################
@@ -17,27 +17,10 @@ rover_msgin_topic = 'ROVER/msgin'
 # Check emergencyq and flag
 # handle stop messages
 
-global layout_q
 
 class Process():
     def __init__(self,mqtt_client:Client,callq,roverstate_q,rovercross_q,layout_q,go_msg_q,junction_q):
         self.station_list = station.readfromlayout('layout.json')
-
-        
-
-
-#         print(self.station_list)
-#         for stat in self.station_list:
-#             if stat.right:
-#                 print('R',stat.right.st_id,end='\t|')
-#             if stat.left:
-#                 print('L',stat.left.st_id,end='\t|')
-#             if stat.up:
-#                 print('U',stat.up.st_id,end='\t|')
-#             if stat.down:
-#                 print('D',stat.down.st_id,end='\t|')
-# # 
-
         self.rover_obj = rover.Rover(0,0,1)
         self.mqttclient = mqtt_client 
         self.callq = callq
@@ -47,6 +30,7 @@ class Process():
         self.go_msg_q = go_msg_q
         self.junction_q = junction_q
         self.rotation_destination = None
+        self.current_rotation_position = "S"
 
 
     def check_new_layout(self):
@@ -54,7 +38,7 @@ class Process():
         if not self.layout_q.empty():
             _layout = self.layout_q.get()
             self.station_list = station.layoutfromText(_layout)
-            self.mqttclient.publish('HMI/layoutupdate',"success")
+            self.mqttclient.publish(layout_update_topic,"success")
 
     def checkcallq(self):
         """Check if call q empty, check if roverfree, then get call from the station and send the rover"""
@@ -82,7 +66,10 @@ class Process():
             if self.rover_obj.destination:
                 
                 if crossed_station_type == 'JUNCTION':
-                    if crossed_station_obj.up in self.rover_obj.path or crossed_station_obj.down in self.rover_obj.path:
+                    if self.current_rotation_position == 'S'  and  (crossed_station_obj.up in self.rover_obj.path or crossed_station_obj.down in self.rover_obj.path):
+                        self.mqttclient.publish(f'{crossed_station}/crossyes','Y')
+                        self.mqttclient.publish(f'ROVER/msgin','SLOWDOWN')
+                    elif self.current_rotation_position == 'C'  and (crossed_station_obj.left in self.rover_obj.path or crossed_station_obj.right in self.rover_obj.path):
                         self.mqttclient.publish(f'{crossed_station}/crossyes','Y')
                         self.mqttclient.publish(f'ROVER/msgin','SLOWDOWN')
                     else:
@@ -152,15 +139,11 @@ class Process():
                     self.mqttclient.publish(f'{sender_type}|{junc_id}/rotate',self.rotation_destination)
                     return 
                 if direction == self.rotation_destination:
+                    self.current_rotation_position = self.rotation_destination
                     self.rotation_destination = None
                     self.mqttclient.publish(f'{sender_type}|{junc_id}/rotate_ok','Y')
 
 
-            
-
-                
-
-        
 
     def put_rover_to_rest(self,sender):
         self.rover_obj.state = 99
