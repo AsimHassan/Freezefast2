@@ -263,7 +263,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
-  if(strcmp(topic,emergency_in_topic)==0){
+  if(strcmp(topic,emergencyin_topic)==0){
           current_rover_state = EMERGENCY_STOP;
           mqttclient.publish("rover/ack","EMERGENCY|ACK");
           return;
@@ -369,7 +369,7 @@ int mqtt_state_machine(){
                     Serial.println("Connected to server");
                     mqttclient.publish("status/rover/connection","CONNECTED");
                     mqttclient.subscribe("rover/msgin");
-                    mqttclient.subscribe(emergency_in_topic);
+                    mqttclient.subscribe(emergencyin_topic);
                     current_mqtt_state = CONNECTED;
                 }
                 else{
