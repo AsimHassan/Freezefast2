@@ -348,7 +348,7 @@ void callback(char* topic, byte* payload, unsigned int length){
            current_station_state == CALL || 
            current_station_state == WAITFORCALLACK)
         {
-            Serial.print("hello");
+            Serial.print("hello")
             previous_station_state = current_station_state;
             current_station_state = CALLED;
             Serial.println(current_station_state);
