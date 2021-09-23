@@ -14,13 +14,6 @@
         "info": ""
     },
     {
-        "id": "f533deb869ac5d3e",
-        "type": "tab",
-        "label": "Test_call",
-        "disabled": false,
-        "info": ""
-    },
-    {
         "id": "3c70a98f2ce8406d",
         "type": "tab",
         "label": "Test_station",
@@ -3290,5 +3283,591 @@
         "x": 480,
         "y": 680,
         "wires": []
+    },
+    {
+        "id": "88cb8499ae01d4e4",
+        "type": "inject",
+        "z": "754f7217fb3d7aa8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "REVERSE",
+        "payloadType": "str",
+        "x": 1100,
+        "y": 620,
+        "wires": [
+            [
+                "3aaaf6036ff716b4"
+            ]
+        ]
+    },
+    {
+        "id": "598d1918f6a33179",
+        "type": "inject",
+        "z": "754f7217fb3d7aa8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "SLOWDOWN",
+        "payloadType": "str",
+        "x": 1110,
+        "y": 680,
+        "wires": [
+            [
+                "3aaaf6036ff716b4"
+            ]
+        ]
+    },
+    {
+        "id": "16cf5424cfc3e47f",
+        "type": "inject",
+        "z": "754f7217fb3d7aa8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "FORWARD",
+        "payloadType": "str",
+        "x": 1110,
+        "y": 560,
+        "wires": [
+            [
+                "3aaaf6036ff716b4"
+            ]
+        ]
+    },
+    {
+        "id": "76f41029fa9982d4",
+        "type": "inject",
+        "z": "754f7217fb3d7aa8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "STOP",
+        "payloadType": "str",
+        "x": 1090,
+        "y": 740,
+        "wires": [
+            [
+                "3aaaf6036ff716b4"
+            ]
+        ]
+    },
+    {
+        "id": "a4aa296fd4994ca9",
+        "type": "inject",
+        "z": "754f7217fb3d7aa8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "REST",
+        "payloadType": "str",
+        "x": 1090,
+        "y": 800,
+        "wires": [
+            [
+                "3aaaf6036ff716b4"
+            ]
+        ]
+    },
+    {
+        "id": "3aaaf6036ff716b4",
+        "type": "mqtt out",
+        "z": "754f7217fb3d7aa8",
+        "name": "",
+        "topic": "ROVER/msgin",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "54628563595314ab",
+        "x": 1540,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "7452d29fa5b8a6b6",
+        "type": "mqtt out",
+        "z": "754f7217fb3d7aa8",
+        "name": "",
+        "topic": "emergency/in/start",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "54628563595314ab",
+        "x": 1690,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "d091b5993992f85f",
+        "type": "mqtt out",
+        "z": "754f7217fb3d7aa8",
+        "name": "",
+        "topic": "emergency/in/start",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "54628563595314ab",
+        "x": 1690,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "0aecdb653729a55b",
+        "type": "inject",
+        "z": "754f7217fb3d7aa8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "ROVER",
+        "payloadType": "str",
+        "x": 1230,
+        "y": 320,
+        "wires": [
+            [
+                "7452d29fa5b8a6b6"
+            ]
+        ]
+    },
+    {
+        "id": "d3ecf9f5025f2b49",
+        "type": "inject",
+        "z": "754f7217fb3d7aa8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "ROVER",
+        "payloadType": "str",
+        "x": 1230,
+        "y": 400,
+        "wires": [
+            [
+                "d091b5993992f85f"
+            ]
+        ]
+    },
+    {
+        "id": "b2e4c12f0b4040cd",
+        "type": "mqtt out",
+        "z": "3c70a98f2ce8406d",
+        "name": "",
+        "topic": "STATION|1/callack",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "54628563595314ab",
+        "x": 1270,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "87712184bb4d1e70",
+        "type": "mqtt out",
+        "z": "3c70a98f2ce8406d",
+        "name": "",
+        "topic": "STATION|1/goack",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "54628563595314ab",
+        "x": 1270,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "3b521bdd31a902e9",
+        "type": "mqtt out",
+        "z": "3c70a98f2ce8406d",
+        "name": "",
+        "topic": "STATION|1/crossyes",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "54628563595314ab",
+        "x": 1280,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "1a6fec5c1f619244",
+        "type": "mqtt out",
+        "z": "3c70a98f2ce8406d",
+        "name": "",
+        "topic": "STATION|1/crossno",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "54628563595314ab",
+        "x": 1270,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "3466adc4f2019607",
+        "type": "mqtt out",
+        "z": "3c70a98f2ce8406d",
+        "name": "",
+        "topic": "STATION|1/stop",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "54628563595314ab",
+        "x": 1260,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "6dfb4cc9cc341923",
+        "type": "inject",
+        "z": "3c70a98f2ce8406d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "STATION|1",
+        "payloadType": "str",
+        "x": 920,
+        "y": 640,
+        "wires": [
+            [
+                "b2e4c12f0b4040cd"
+            ]
+        ]
+    },
+    {
+        "id": "ced5af7f08fb77ec",
+        "type": "inject",
+        "z": "3c70a98f2ce8406d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "STATION|1",
+        "payloadType": "str",
+        "x": 920,
+        "y": 700,
+        "wires": [
+            [
+                "87712184bb4d1e70"
+            ]
+        ]
+    },
+    {
+        "id": "93f6650f55d6c13b",
+        "type": "inject",
+        "z": "3c70a98f2ce8406d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "STATION|1",
+        "payloadType": "str",
+        "x": 920,
+        "y": 760,
+        "wires": [
+            [
+                "3b521bdd31a902e9"
+            ]
+        ]
+    },
+    {
+        "id": "7d875ee0c07f26ef",
+        "type": "inject",
+        "z": "3c70a98f2ce8406d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "STATION|1",
+        "payloadType": "str",
+        "x": 920,
+        "y": 820,
+        "wires": [
+            [
+                "1a6fec5c1f619244"
+            ]
+        ]
+    },
+    {
+        "id": "1c8629b7f3897211",
+        "type": "inject",
+        "z": "3c70a98f2ce8406d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "STATION|1",
+        "payloadType": "str",
+        "x": 920,
+        "y": 880,
+        "wires": [
+            [
+                "3466adc4f2019607"
+            ]
+        ]
+    },
+    {
+        "id": "06abd812da83d05f",
+        "type": "mqtt out",
+        "z": "3c70a98f2ce8406d",
+        "name": "",
+        "topic": "emergency/in/start",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "54628563595314ab",
+        "x": 1330,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "34a23cde6423b311",
+        "type": "mqtt out",
+        "z": "3c70a98f2ce8406d",
+        "name": "",
+        "topic": "emergency/in/start",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "54628563595314ab",
+        "x": 1330,
+        "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "0376140111c292fa",
+        "type": "inject",
+        "z": "3c70a98f2ce8406d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "STATION|1",
+        "payloadType": "str",
+        "x": 900,
+        "y": 960,
+        "wires": [
+            [
+                "06abd812da83d05f"
+            ]
+        ]
+    },
+    {
+        "id": "2255b7836809e1fa",
+        "type": "inject",
+        "z": "3c70a98f2ce8406d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "STATION|1",
+        "payloadType": "str",
+        "x": 900,
+        "y": 1040,
+        "wires": [
+            [
+                "34a23cde6423b311"
+            ]
+        ]
     }
 ]
