@@ -47,6 +47,7 @@ EMERGENCY_OVER_TOPIC='HMI/emergency/over'
 EMEGENCY_OUT_TOPIC='HMI/emergency'
 CALL_TOPIC= 'HMI/CALL'
 GO_TOPIC='HMI/GO'
+ROVER_POSITION_TOPIC='ROVER/position'
 
 
 
@@ -112,6 +113,14 @@ class Mainwindow(Frame):
 
     def pollqueue(self):
         if not msg_in_q.empty():
+            [msg_type,message] = msg_in_q.get()
+            if msg_type ==1:
+                stat = self.get_station_by_id(int(message))
+                if stat:
+                    stat.btn.configure(background='green')
+                    if self.lastposition:
+                        self.lastposition.btn.configure(background='red')
+                    self.lastposition = stat
             try: self.msginlabel['text'] = msg_in_q.get()
             except IndexError: pass
         self.master.after(ms=200,func=self.pollqueue)
@@ -124,14 +133,23 @@ class Mainwindow(Frame):
         for stat in self.stnlist:
             if stat.st_id == btnnumber:
                 return stat
-
         return None
+
+    def get_station_by_id(self,st_id):
+        for stat in self.stnlist:
+            if st_id == stat.st_id:
+                return stat
+        return None
+
+
+
     def initUI(self):
         self.master.title("HMI")
         self.pack(fill=BOTH, expand = 1)
         self.btn_list = []
         self.btn_state = []
         self.stnlist=[]
+        self.lastposition = None
         Style().configure("Tframe", background="#333")
 
         button_add = Button(self,text='Add station', command=self.popup)
@@ -230,8 +248,21 @@ class Station():
         self.btnsize = sz
 
 
+
+#################Incoming message type to number################
+#  Position update: 1
+# 
+
+
+
+def on_position_update(client,userdata,message):
+    msg_in_q.put((1,message.payload.decode()))
+
+
+
 def on_connect(client, userdata,flags,rc):
     client.subscribe('HMI/test')
+    client.subscribe(ROVER_POSITION_TOPIC)
 
 def on_disconnect(client,userdata,message):
     print("mqtt disconnected")
@@ -252,7 +283,7 @@ def mqttthread(client_mqtt):
         client_mqtt.on_connect=on_connect
         client_mqtt.on_disconnect = on_disconnect
         client_mqtt.on_message=on_message
-
+        client_mqtt.message_callback_add(ROVER_POSITION_TOPIC,on_position_update)
         client_mqtt.loop_forever()
         
     except KeyboardInterrupt:
@@ -265,7 +296,7 @@ def mqtt_out_thread(client_mqtt:mqtt.Client):
     while True:
         if client_mqtt.is_connected():
             if msg_out_q.empty():
-                sleep(0.3)
+                sleep(0.2)
                 continue
             
             [_,topic,msg] = msg_out_q.get()

@@ -7,7 +7,7 @@ import station
 
 rover_msgin_topic = 'ROVER/msgin'
 layout_update_topic = 'HMI/layoutupdate'
-
+rover_position_topic = 'ROVER/position'
 
 ######## processs #################################
 # Check call queue 
@@ -63,6 +63,7 @@ class Process():
             crossed_station_id = crossed_station.split("|")[1]
             crossed_station_obj = station.get_station(self.station_list,crossed_station_id)
             self.rover_obj.position =  crossed_station_id
+            self.mqttclient.publish(rover_position_topic,str(self.rover_obj.position))
             if self.rover_obj.destination:
                 
                 if crossed_station_type == 'JUNCTION':
