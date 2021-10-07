@@ -18,6 +18,27 @@ def popup_bonus():
 def close():
     exit()
 
+
+
+
+class station:
+    def __init__(self, st_id ):
+        self.right = None
+        self.left = None
+        self.up = None
+        self.down = None
+        self.type = "STATION"
+        self.st_id = st_id
+        self.pos_x = 0
+        self.pox_y = 0
+        self.size = btnsize
+    def place_in_center_of_screen(self):
+        self.pos_x = xbtn1
+        self.pos_y = ybtn1A
+
+
+
+
 class popupWindow_station(Frame):
     def __init__(self,master):
         top=self.top=Toplevel(master)
