@@ -171,7 +171,7 @@ class Process():
         sender_id = sendersplit[1]
         print(f"{sender}|{sendersplit}|{sender_id}|{sender_name}")
         if int(sender_id) != int(self.rover_obj.position):
-            print("why am i getting this go signal")
+            print("Error: Go From non docked station")
             return
 
         if sender_name == 'HMI':
