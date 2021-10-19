@@ -69,16 +69,16 @@ class Process():
                 if crossed_station_type == 'JUNCTION':
                     if self.current_rotation_position == 'S'  and  (crossed_station_obj.up in self.rover_obj.path or crossed_station_obj.down in self.rover_obj.path):
                         self.mqttclient.publish(f'{crossed_station}/crossyes','Y')
-                        self.mqttclient.publish(f'ROVER/msgin','SLOWDOWN')
+                        self.mqttclient.publish('ROVER/msgin','SLOWDOWN')
                     elif self.current_rotation_position == 'C'  and (crossed_station_obj.left in self.rover_obj.path or crossed_station_obj.right in self.rover_obj.path):
                         self.mqttclient.publish(f'{crossed_station}/crossyes','Y')
-                        self.mqttclient.publish(f'ROVER/msgin','SLOWDOWN')
+                        self.mqttclient.publish('ROVER/msgin','SLOWDOWN')
                     else:
                         self.mqttclient.publish(f'{crossed_station}/crossno','Y')
                     continue
                 if self.rover_obj.destination == crossed_station_id:
                     self.mqttclient.publish(f'{crossed_station}/crossyes','Y')
-                    self.mqttclient.publish(f'ROVER/msgin','SLOWDOWN')
+                    self.mqttclient.publish('ROVER/msgin','SLOWDOWN')
                     continue
                 if crossed_station_obj not in self.rover_obj.path:
                     self.recalculatedirection()
@@ -91,7 +91,7 @@ class Process():
 
     def recalculatedirection(self):
         
-        print(f"recalculatedirection")
+        print("recalculatedirection")
         self.rover_obj.path=[]
         self.rover_obj.path,self.rover_obj.direction =  station.get_direction(self.station_list,self.rover_obj.position,self.rover_obj.destination,self.rover_obj.path)  
         self.mqttclient.publish(rover_msgin_topic,self.rover_obj.direction)

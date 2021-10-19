@@ -13,6 +13,26 @@ active_client_list= set()
 
 
 
+
+# EMERGENCY_TOPIC = "+/emergency"
+# ON_CONNECTION_TOPIC = "status/+/connection"
+# ON_DISCONNECTION_TOPIC ="status/+/disconnection"
+# CALL_TOPIC="+/call"
+# "Server/msg/in"
+# "HMI/emergency_over"
+# "ROVER/STATE"
+# "HMI/layout/new"
+# "+/rovercross"
+# "+/go"
+# "+/stop"
+# "+/slowdown"
+# "+/readytoleave"
+# "+/roverstoppedjunction"
+# "+/rotationdone"
+
+
+
+
 ########## on rover cross #####################################
 # check if station has called for rover
 # if yes send slow down to rover and cross yes to station
@@ -53,13 +73,13 @@ def on_readytoleave(client,userdata,message):
 
 ########## on GO signal received #################################
 def on_go_signal(client,userdata,message):
-    go_msg_q.put(message.payload.decode())
+    go_msg_q.put(message.decode())
     print("added to go q")
 
 def on_slowdown(client,userdata,message):
-    stat = message.payload.decode()
+    stat = message.topic.split('/')[0]
     client.publish('ROVER/msgin',"SLOWDOWN")
-    client.publish(f'{stat}/slowdown','ack')
+    client.publish(f'{stat}/slowdownack','ack')
 
 
 ############# on call ##################

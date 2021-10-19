@@ -58,7 +58,7 @@ class Application():
         framelist['frame1'] = frame1 
         framelist['rover'] = rover
 
-        changeframe('rover')
+        changeframe('frame1')
         self.root_window.update()
 
         
@@ -362,8 +362,6 @@ def on_connect(client, userdata,flags,rc):
     global mqtt_connection_flag
     mqtt_connection_flag = True
     print("mqtt connected ")
-    client.subscribe('HMI/test')
-
     client.subscribe(ROVER_POSITION_TOPIC)
     client.subscribe(ROVER_SENS_B)
     client.subscribe(ROVER_SENS_F)
@@ -434,8 +432,8 @@ def main():
     try:
         t1.start()
         window = tk.Tk()
-        window.attributes('-type','dock')
-        window.geometry("800x400+40+40")
+        window.attributes('-fullscreen','True')
+        window.geometry(sizeandloc)
         app = Application(window)
         t2.start()
         window.mainloop()

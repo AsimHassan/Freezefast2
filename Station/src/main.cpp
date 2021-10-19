@@ -263,7 +263,7 @@ int station_state_machine(){
             }
             if (greenswitch == HIGH){
                 current_station_state = GO_PRESSED;
-                mqttclient.publish(go_topic,"Y");    
+                mqttclient.publish(go_topic,"STATION|"STATIONID);    
             } 
             break;
 
@@ -407,9 +407,9 @@ int mqtt_state_machine(){
         case RECONNECTING:
             reconnection_time_0 = millis();
             while (!mqttclient.connected())
-                if (mqttclient.connect(STATIONID,"status/" STATIONID "/disconnection",0,false,"DISCONNECTED")){
+                if (mqttclient.connect(STATIONID,"status/" STATIONID "/disconnection",0,false,"STATION|"STATIONID)){
                     Serial.println("Connected to server");
-                    mqttclient.publish("status/" STATIONID "/connection","CONNECTED");
+                    mqttclient.publish("status/" STATIONID "/connection","STATION|"STATIONID);
                     mqttclient.subscribe(STATIONID "/msgin");
                     mqttclient.subscribe(crossno_topic);
                     mqttclient.subscribe(crossyes_topic);
